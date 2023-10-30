@@ -60,16 +60,38 @@ function normalizeRows(rawRows) {
 }
 
 const mapResultsToEvidenceColumnTypes = function (rows) {
-	return Object.entries(rows[0]).map(([name, value]) => {
-		let typeFidelity = 'precise';
-		let evidenceType = nativeTypeToEvidenceType(value);
-		if (!evidenceType) {
-			typeFidelity = 'inferred';
-			evidenceType = 'string';
+	const dataTypes = {};
+	let typeFidelity = {};
+	// Find the first row that has a value for each column.
+	for (const row of rows) {
+	  for (const [name, value] of Object.entries(row)) {
+		if (!dataTypes[name]) {
+		  const evidenceType = nativeTypeToEvidenceType(value);
+		  if (evidenceType) {
+			dataTypes[name] = evidenceType;
+			typeFidelity[name] = 'precise';
+		  }
 		}
-		return { name, evidenceType, typeFidelity };
+	  }
+	  
+	  // Check if all columns have been determined and stop iterating.
+	  if (Object.keys(dataTypes).length === Object.keys(row).length) {
+		break;
+	  }
+	}
+  
+	// If a column is still undefined, set it to 'string' as a default.
+	for (const [name, value] of Object.entries(rows[0])) {
+	  if (!dataTypes[name]) {
+		dataTypes[name] = 'string';
+		typeFidelity[name] = 'inferred';
+	  }
+	}
+  
+	return Object.entries(dataTypes).map(([name, evidenceType]) => {
+	  return { name, evidenceType, typeFidelity: typeFidelity };
 	});
-};
+};  
 
 const runQuery = async (queryString, database) => {
 	const filename = database ? database.filename : getEnv(envMap, 'filename');
