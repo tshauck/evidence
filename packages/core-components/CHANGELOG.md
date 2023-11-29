@@ -1,5 +1,15 @@
 # @evidence-dev/core-components
 
+## 2.1.4
+
+### Patch Changes
+
+- b4596313: reduces bar width for horizontal bar charts
+- 336dec14: Fix visual regressions in DataTable
+- 8ad23995: Prevent 500 error when creating a directory which only contains a paramaterized page
+- 0f54d725: Reduce font size in queryviewer
+- 8ce5ce82: add fuzzy searching to datatable
+
 ## 2.1.3
 
 ### Patch Changes
